@@ -457,3 +457,27 @@ func (c *HttpClient) V2Currencies() (response []V2CurrenciesResponse, err error)
 	err = c.getRequest(&response, "/v2/currencies/", nil)
 	return
 }
+
+//Markets
+
+type V2MarketsResponse struct {
+	Name                   string  `json:"name"`
+	MarketSymbol           string  `json:"market_symbol"`
+	BaseCurrency           string  `json:"base_currency"`
+	BaseDecimals           int     `json:"base_decimals"`
+	CounterCurrency        string  `json:"counter_currency"`
+	CounterDecimals        int     `json:"counter_decimals"`
+	MinimumOrderValue      float64 `json:"minimum_order_value"`
+	MaximumOrderValue      float64 `json:"maximum_order_value"`
+	MinimumOrderAmount     float64 `json:"minimum_order_amount"`
+	MaximumOrderAmount     float64 `json:"maximum_order_amount"`
+	Trading                string  `json:"trading"`
+	InstantOrderDecimals   int     `json:"instant_order_decimals"`
+	InstantAndMarketOrders string  `json:"instant_and_market_orders"`
+	Description            string  `json:"description"`
+}
+
+func (c *HttpClient) V2Markets() (response []V2MarketsResponse, err error) {
+	err = c.getRequest(&response, "/v2/markets/", nil)
+	return
+}
