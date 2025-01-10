@@ -80,7 +80,7 @@ func (c *WsClient) Close() {
 	c.done <- true
 }
 
-func (c *WsClient) Subscribe(channels ...string) {
+func (c *WsClient) Subscribe(channels ...string) error {
 	for _, channel := range channels {
 		sub := WsEvent{
 			Event: "bts:subscribe",
@@ -88,11 +88,14 @@ func (c *WsClient) Subscribe(channels ...string) {
 				"channel": channel,
 			},
 		}
-		c.sendEvent(sub)
+		if err := c.sendEvent(sub); err != nil {
+			return fmt.Errorf("c.sendEvent: %w", err)
+		}
 	}
+	return nil
 }
 
-func (c *WsClient) Unsubscribe(channels ...string) {
+func (c *WsClient) Unsubscribe(channels ...string) error {
 	for _, channel := range channels {
 		sub := WsEvent{
 			Event: "bts:unsubscribe",
@@ -100,8 +103,11 @@ func (c *WsClient) Unsubscribe(channels ...string) {
 				"channel": channel,
 			},
 		}
-		c.sendEvent(sub)
+		if err := c.sendEvent(sub); err != nil {
+			return fmt.Errorf("c.sendEvent: %w", err)
+		}
 	}
+	return nil
 }
 
 // Determines whether server is requesting reconnect. If such a request is made by the server,
@@ -112,12 +118,13 @@ func (c *WsClient) IsReconnectRequest(event *WsEvent) bool {
 	return event.Event == "bts:request_reconnect"
 }
 
-func (c *WsClient) sendEvent(sub WsEvent) {
+func (c *WsClient) sendEvent(sub WsEvent) error {
 	c.sendLock.Lock()
 	defer c.sendLock.Unlock()
 
-	err := c.ws.WriteJSON(&sub)
-	if err != nil {
-		fmt.Println(err)
+	if err := c.ws.WriteJSON(&sub); err != nil {
+		return fmt.Errorf("c.ws.WriteJSON: %w", err)
 	}
+
+	return nil
 }
